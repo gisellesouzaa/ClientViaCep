@@ -10,7 +10,7 @@
 - Implementa tratamento de erros para cenários como CEP inválido, CEP inexistente ou sistema indisponível.
 - Utiliza conceitos de orientação a objetos para encapsular a lógica de consumo da API em um método reutilizável.
 - Emprega a biblioteca Lombok para reduzir a verbosidade do código e melhorar a legibilidade.
-- Oferece uma abordagem eficiente para integrar informações de endereço em aplicativos Java.
+- Oferece uma abordagem fácil e eficiente para consumo de API integrando o Spring Boot com o framework Jersey, através da dependência `spring-boot-starter-jersey`.
 
 ### 🛠 Resumo de como o código funciona:
 
