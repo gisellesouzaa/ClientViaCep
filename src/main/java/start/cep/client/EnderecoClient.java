@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.log4j.Log4j2;
 import start.cep.exceptions.ErroDeNegocioException;
 import start.cep.exceptions.TabelaErros;
+//trocar nome
 @Component
 @Log4j2
 public class EnderecoClient { 
@@ -43,7 +44,6 @@ public class EnderecoClient {
 		} catch (ProcessingException e) {
 			log.error("consultarCep() Erro Processing Exception: e=", e); 
 			throw new ErroDeNegocioException(TabelaErros.SISTEMA_INDISPONIVEL);
-//			Erro gerado ao errar a URL, por exemplo
 		}
 	}
 
