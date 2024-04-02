@@ -1,7 +1,6 @@
 package start.cep.client;
 
-import java.io.IOException;
-
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation.Builder;
@@ -10,33 +9,52 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.stereotype.Component;
 
+import lombok.extern.log4j.Log4j2;
+import start.cep.exceptions.ErroDeNegocioException;
+import start.cep.exceptions.TabelaErros;
+//trocar nome
 @Component
-public class CepClient {
-
-	public static CepModel consultarCep(String cep) throws IOException {
-		Client client = ClientBuilder.newClient();
-		WebTarget target =client.target("https://viacep.com.br/ws/" + cep + "/json/");
-		Builder builder = target.request();
-		
-		Response response = builder.get();
-		
-		int status = response.getStatus();
-		
-		if(status == 200 || status == 201) {
-			CepModel entity = response.readEntity(CepModel.class);
-			
-			return entity;
-		}
-		throw new RuntimeException("Status " + status);
-	}
-	
-	public static void main(String[] args){
+@Log4j2
+public class CepClient { 
+	public static CepModel consultarCep(String cep) throws ErroDeNegocioException {
 		try {
-			System.out.println(consultarCep("08575220"));
-		} catch (IOException e) {
-			e.printStackTrace();
+			Client client = ClientBuilder.newClient();
+			WebTarget target = client.target("https://viacep.com.br/ws/" + cep + "/json/");
+			Builder builder = target.request();
+
+			Response response = builder.get();
+
+			int status = response.getStatus();
+
+			if (status == 200 || status == 201) {
+				CepModel enderecoResponseDto = response.readEntity(CepModel.class);
+
+				if (Boolean.TRUE.equals(enderecoResponseDto.getErro())) {
+					throw new ErroDeNegocioException(TabelaErros.CEP_INEXISTENTE);
+				}
+				return enderecoResponseDto;
+			}
+
+			if (status == 400) {
+				throw new ErroDeNegocioException(TabelaErros.CEP_INVALIDO);
+			}
+
+			throw new ErroDeNegocioException(TabelaErros.SISTEMA_INDISPONIVEL);
+
+		} catch (ProcessingException e) {
+			log.error("consultarCep() Erro Processing Exception: e=", e); 
+			throw new ErroDeNegocioException(TabelaErros.SISTEMA_INDISPONIVEL);
 		}
 	}
 
-	
+	public static void main(String[] args) {
+		try {
+			System.out.println(consultarCep("01310-100"));
+//			System.out.println(consultarCep("x"));
+//			System.out.println(consultarCep("99999-100"));
+		} catch (ErroDeNegocioException e) {
+			throw e;
+		}
+	}
+
 }
